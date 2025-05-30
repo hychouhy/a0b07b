@@ -15,7 +15,7 @@ const processedGraphData = (graphData: GraphData) : ProcessedGraphData => {
         formDependenciesDict[node.id] = {
             formId: node.id,
             formName: node.data.name,
-            parentIds: {...node.data.prerequisites}
+            parentIds: [...node.data.prerequisites]
         }
     });
 
@@ -42,11 +42,46 @@ const processedGraphData = (graphData: GraphData) : ProcessedGraphData => {
         }
     });
 
+    // sort for proper DAG ordering
+    const sortedFormIds: string[] = [];
+    const visited = new Set<string>();
+    const tempVisited = new Set<string>();
+
+    const visit = (nodeId: string) => {
+        if (tempVisited.has(nodeId)) {
+            console.warn('Cycle in graph');
+            return;
+        }
+
+        if (visited.has(nodeId)) {
+            return;
+        }
+
+        tempVisited.add(nodeId);
+
+        const node = formDependenciesDict[nodeId];
+        if (node) {
+            node.parentIds.forEach(parentIds => {
+                visit(parentIds)
+            });
+        }
+
+        tempVisited.delete(nodeId);
+        visited.add(nodeId);
+        sortedFormIds.push(nodeId);
+    };
+
+    graphData.nodes.forEach(node => {
+        if (!visited.has(node.id)) {
+            visit(node.id);
+        }
+    });
+
     return {
         GraphId: graphData.id,
-        formDependenciesDict: formDependenciesDict,
-        formFiedlsDict: formFieldsDict,
-        sortedFormIds: []
+        formDependenciesDict,
+        formFieldsDict,
+        sortedFormIds
     };
 
 };

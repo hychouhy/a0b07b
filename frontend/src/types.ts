@@ -76,6 +76,6 @@ export interface FormFieldsDict {
 export interface ProcessedGraphData {
     GraphId: string;
     formDependenciesDict: FormDependenciesDict;
-    formFiedlsDict: FormFieldsDict;
+    formFieldsDict: FormFieldsDict;
     sortedFormIds: string[];
 }

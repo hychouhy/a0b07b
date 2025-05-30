@@ -14,20 +14,23 @@ const App: React.FC = () => {
   return (
     <div style={{ padding: '2rem', fontFamily: 'Arial' }}>
       <h1>Journey Builder!</h1>
-      {Object.entries(data.formFiedlsDict).map(([formId, formFields]) => (
-        <div>
-          <h2> Form ID: {formId} </h2>
-          <h3> Form Name: {formFields.formName} </h3>
-          <ul>
-            {formFields.fields.map((field, index) => (
-              <li>
-                Field Name: {field.fieldName}
-                Field Type: {field.type}
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
+      {data.sortedFormIds.map(id => {
+        const formNode = data.formFieldsDict[id]
+        return (
+          <div> 
+            <h2> Form ID: {id} </h2>
+            <h3> Form Name: {formNode.formName} </h3>
+            <ul>
+              {formNode.fields.map((field, index) => (
+                <li>
+                  Field Name: {field.fieldName}
+                  Field Type: {field.type}
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
+      })}
 
     </div>
   );
