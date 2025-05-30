@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { FormDependenciesDict, FormFieldObject, FormFieldsDict } from "../types";
 import { fileURLToPath } from "url";
 
+import { CustomModal } from './CustomModal'
+
 interface PrefillFieldProps {
     nodeId: string;
     fieldObject: FormFieldObject;
@@ -13,6 +15,8 @@ const renderInputField = (
     avantos_type: string,
 ) => {
     switch (avantos_type) {
+
+        // TODO: handle submit
         case 'button':
             return <button onClick={() => {}}> Submit </button>;
         
@@ -112,6 +116,7 @@ const get_prefillValue_bfs = (
         const hasValue = true;
 
         // if found 
+        // TODO: return value
         if (matchingField && hasValue) {
             return (parentForm.formName + "." + fieldName);
         }
@@ -131,6 +136,15 @@ export const PrefillField: React.FC<PrefillFieldProps> = ({
     formDependenciesDict,
     formFieldsDict
 }) => {
+    const [ modalOpen, setModalOpen ] = useState(false);
+
+    const handleFieldClick = (fieldName: string) => {
+        if (fieldName === 'dynamic_checkbox_group'
+            || fieldName === 'dynamic_object') {
+            
+            setModalOpen(!modalOpen);
+        }
+    }
 
     // get prefill value
     let prefillValue: string | null = null;
@@ -152,6 +166,7 @@ export const PrefillField: React.FC<PrefillFieldProps> = ({
                 display: 'flex',
                 justifyContent: 'space-between'
             }}
+            onClick={() => handleFieldClick(fieldObject.fieldName)}
         >
             <div>
                 <strong>{fieldObject.fieldName}</strong> {fieldObject.avantos_type}
@@ -162,6 +177,13 @@ export const PrefillField: React.FC<PrefillFieldProps> = ({
                     : 'No Mapping'}
             </div>
             {renderInputField(fieldObject.avantos_type)}
+            
+            <CustomModal
+                nodeId={nodeId}
+                isOpen={modalOpen}
+                formDependenciesDict={formDependenciesDict}
+                formFieldsDict={formFieldsDict}
+            />
         </div>
     );
 }
