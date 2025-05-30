@@ -33,10 +33,14 @@ export const FormNode: React.FC<FormNodeProps> = ({
                 <h3> {nodeName} </h3>
                 <p>{isExpanded ? '▼' : '▶'}</p>
             </div>
-            {isExpanded && (
-                <div style={{paddingLeft : '1rem',}}> 
+            {true && (
+                <div style={{
+                                paddingLeft : '1rem', 
+                                paddingRight : '1rem'
+                            }}
+                > 
                     <p> Form ID: {nodeId} </p>
-                    <ul>
+                    <ul style={{paddingLeft : '0'}}>
                     {nodeField.map((field) => {
                         return (
                             <div>
