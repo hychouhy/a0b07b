@@ -1,17 +1,17 @@
 import React, { useState } from "react";
 import { DependencyObject, FormDependenciesDict, FormFieldObject, FormFieldsDict } from '../types'
 
+import { PrefillField } from './PrefillField'
+
 interface FormNodeProps {
     nodeId: string;
     nodeName: string;
-    nodeDependency: DependencyObject;
     nodeField: FormFieldObject[];
 }
 
 export const FormNode: React.FC<FormNodeProps> = ({
     nodeId,
     nodeName,
-    nodeDependency,
     nodeField,
 }) => {
     const [ isExpanded, setIsExpanded ] = useState(false);
@@ -40,9 +40,10 @@ export const FormNode: React.FC<FormNodeProps> = ({
                     {nodeField.map((field) => {
                         return (
                             <div>
-                                <PrefillField>
-                                    
-                                </PrefillField>
+                                <PrefillField
+                                    nodeId={nodeId}
+                                    fieldObject={field}
+                                />
                             </div>
                         )
                     })}

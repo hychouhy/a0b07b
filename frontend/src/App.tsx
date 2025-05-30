@@ -22,7 +22,6 @@ const App: React.FC = () => {
             <FormNode
               nodeId={id}
               nodeName={formNode.formName}
-              nodeDependency={nodeDependency}
               nodeField={formNode.fields}
             />
           </div>
