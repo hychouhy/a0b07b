@@ -1,8 +1,8 @@
 // src/App.tsx
 import React from 'react';
 import { useProcessedGraphData } from './hooks/useProcessedGraphData'
-import { formatDiagnostic } from 'typescript';
-import { debugPort } from 'node:process';
+
+import { FormNode } from './component/FormNode'
 
 const App: React.FC = () => {
   const {data, loading, error } = useProcessedGraphData();
@@ -14,24 +14,11 @@ const App: React.FC = () => {
   return (
     <div style={{ padding: '2rem', fontFamily: 'Arial' }}>
       <h1>Journey Builder!</h1>
-      {data.sortedFormIds.map(id => {
-        const formNode = data.formFieldsDict[id]
-        return (
-          <div> 
-            <h2> Form ID: {id} </h2>
-            <h3> Form Name: {formNode.formName} </h3>
-            <ul>
-              {formNode.fields.map((field, index) => (
-                <li>
-                  Field Name: {field.fieldName}
-                  Field Type: {field.type}
-                </li>
-              ))}
-            </ul>
-          </div>
-        );
-      })}
-
+      <FormNode
+        formDependenciesDict={data.formDependenciesDict}
+        formFieldsDict={data.formFieldsDict}
+        sortedFormIds={data.sortedFormIds}
+      />
     </div>
   );
 };
