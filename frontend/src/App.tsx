@@ -23,6 +23,8 @@ const App: React.FC = () => {
               nodeId={id}
               nodeName={formNode.formName}
               nodeField={formNode.fields}
+              formDependenciesDict={data.formDependenciesDict}
+              formFieldsDict={data.formFieldsDict}
             />
           </div>
           

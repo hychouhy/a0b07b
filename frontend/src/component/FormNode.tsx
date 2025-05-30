@@ -7,12 +7,16 @@ interface FormNodeProps {
     nodeId: string;
     nodeName: string;
     nodeField: FormFieldObject[];
+    formDependenciesDict: FormDependenciesDict,
+    formFieldsDict: FormFieldsDict
 }
 
 export const FormNode: React.FC<FormNodeProps> = ({
     nodeId,
     nodeName,
     nodeField,
+    formDependenciesDict,
+    formFieldsDict,
 }) => {
     const [ isExpanded, setIsExpanded ] = useState(false);
 
@@ -47,6 +51,8 @@ export const FormNode: React.FC<FormNodeProps> = ({
                                 <PrefillField
                                     nodeId={nodeId}
                                     fieldObject={field}
+                                    formDependenciesDict={formDependenciesDict}
+                                    formFieldsDict={formFieldsDict}
                                 />
                             </div>
                         )
