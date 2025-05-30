@@ -14,11 +14,22 @@ const App: React.FC = () => {
   return (
     <div style={{ padding: '2rem', fontFamily: 'Arial' }}>
       <h1>Journey Builder!</h1>
-      <FormNode
-        formDependenciesDict={data.formDependenciesDict}
-        formFieldsDict={data.formFieldsDict}
-        sortedFormIds={data.sortedFormIds}
-      />
+      {data.sortedFormIds.map(id => {
+        const formNode = data.formFieldsDict[id]
+        const nodeDependency = data.formDependenciesDict[id]
+        return (
+          <div>
+            <FormNode
+              nodeId={id}
+              nodeName={formNode.formName}
+              nodeDependency={nodeDependency}
+              nodeField={formNode.fields}
+            />
+          </div>
+          
+        );
+      })}
+
     </div>
   );
 };
