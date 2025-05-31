@@ -3,6 +3,7 @@ import React from 'react';
 import { useProcessedGraphData } from './hooks/useProcessedGraphData'
 
 import { TempFormValuesProvider } from './context/TempFormValusContext';
+import { FieldMappingProvider } from './context/FieldMappingContext';
 import { FormNode } from './component/FormNode'
 
 
@@ -15,26 +16,28 @@ const App: React.FC = () => {
 
   return (
     <TempFormValuesProvider>
+      <FieldMappingProvider>
         <div style={{ padding: '2rem', fontFamily: 'Arial' }}>
-        <h1>Journey Builder!</h1>
-        {data.sortedFormIds.map(id => {
-          const formNode = data.formFieldsDict[id]
-          const nodeDependency = data.formDependenciesDict[id]
-          return (
-            <div>
-              <FormNode
-                nodeId={id}
-                nodeName={formNode.formName}
-                nodeField={formNode.fields}
-                formDependenciesDict={data.formDependenciesDict}
-                formFieldsDict={data.formFieldsDict}
-              />
-            </div>
-            
-          );
-        })}
+          <h1>Journey Builder!</h1>
+          {data.sortedFormIds.map(id => {
+            const formNode = data.formFieldsDict[id]
+            const nodeDependency = data.formDependenciesDict[id]
+            return (
+              <div>
+                <FormNode
+                  nodeId={id}
+                  nodeName={formNode.formName}
+                  nodeField={formNode.fields}
+                  formDependenciesDict={data.formDependenciesDict}
+                  formFieldsDict={data.formFieldsDict}
+                />
+              </div>
+              
+            );
+          })}
 
-      </div>
+        </div>
+      </FieldMappingProvider>
     </TempFormValuesProvider>
   );
 };

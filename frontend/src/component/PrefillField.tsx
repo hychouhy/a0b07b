@@ -3,6 +3,8 @@ import { FormDependenciesDict, FormFieldObject, FormFieldsDict, TempFormValueDic
 
 import { CustomModal } from './CustomModal'
 import { useFormValues } from '../context/TempFormValusContext'
+import { useFieldMapping } from '../context/FieldMappingContext';
+import { MappingDict } from '../types';
 
 interface PrefillFieldProps {
     nodeId: string;
@@ -21,38 +23,16 @@ const renderInputField = (
     displayValue: string | string[],
     usePrefill: boolean,
     onLocalChange: (val: string | string[]) => void,
-    onSubmit: () => void
+    onSubmit: () => void,
+
+    mappings: MappingDict,
+    nodeId: string,
+    formFieldsDict: FormFieldsDict,
 ) => {
     switch (avantos_type) {
         // TODO: handle submit
         case 'button':
             return <button onClick={onSubmit}> Submit </button>;
-        
-        case 'checkbox-group':
-            const dummy_option = ['foo', 'bar', 'foobar'];
-            const selectedValues = Array.isArray(displayValue) ? displayValue : [];
-
-            return (
-                <div>
-                    {dummy_option.map(option => (
-                        <label key={option}>
-                            <input
-                                type="checkbox"
-                                value={option}
-                                disabled={usePrefill}
-                                checked={selectedValues.includes(option)}
-                                onChange={(e) => {
-                                    const updated = e.target.checked
-                                        ? [...selectedValues, option]
-                                        : selectedValues.filter(v => v!== option)  
-                                    onLocalChange(updated)
-                                }}
-                            />
-                            {option}
-                        </label>
-                    ))};
-                </div>
-            );
 
         case 'multi-select':
             const dummy_multiOptions = ['foo', 'bar', 'foobar'];
@@ -78,29 +58,95 @@ const renderInputField = (
 
         case 'multi-line-text':
             return (
-                <textarea
-                    value={displayValue}
-                    disabled={usePrefill}
-                    rows={3}
-                    onChange={(e) => {
-                        onLocalChange(e.target.value)
-                    }}
-                    placeholder="Enter"
-                />
-            )
+                <div style={{ display: 'flex'}}>
+                    <textarea
+                        value={displayValue}
+                        disabled={usePrefill}
+                        rows={3}
+                        onChange={(e) => onLocalChange(e.target.value)}
+                        placeholder="Enter"
+                    />
+                    {!usePrefill && (
+                        <button
+                            type="button"
+                            onClick={() => onLocalChange('')}
+                            style={{height: '100%',}}
+                        >
+                            X
+                        </button>
+                    )}
+                </div>
+            );
 
         case 'short-text':
             return (
-                <input
-                    type="text"
-                    disabled={usePrefill}
-                    value={displayValue}
-                    onChange={(e) => {
-                        onLocalChange(e.target.value)
-                    }}
-                    placeholder="Enter"
-                />
+                <div>
+                    <input
+                        type="text"
+                        disabled={usePrefill}
+                        value={displayValue}
+                        onChange={(e) => onLocalChange(e.target.value)}
+                        placeholder="Enter"
+                    />
+                    {!usePrefill && (
+                        <button
+                            type="button"
+                            onClick={() => onLocalChange('')}
+                        >
+                            ✕
+                        </button>
+                    )}
+                </div>
             );
+
+        case 'checkbox-group':
+            if (mappings[nodeId]?.['dynamic_checkbox_group']) {
+                return (
+                    <span style={{ color: '#888', marginLeft: '8px' }}>
+                        - {formFieldsDict[mappings[nodeId]?.['dynamic_checkbox_group'].sourceId]?.formName}
+                                .{mappings[nodeId]?.['dynamic_checkbox_group'].sourceField}
+                    </span>
+                )
+            }
+
+            return <div>click to select a dynamic object</div>
+
+            // not sure about the dynamic field rendering spec
+            // const dummy_option = ['foo', 'bar', 'foobar'];
+            // const selectedValues = Array.isArray(displayValue) ? displayValue : [];
+
+            // return (
+            //     <div>
+            //         {dummy_option.map(option => (
+            //             <label key={option}>
+            //                 <input
+            //                     type="checkbox"
+            //                     value={option}
+            //                     disabled={usePrefill}
+            //                     checked={selectedValues.includes(option)}
+            //                     onChange={(e) => {
+            //                         const updated = e.target.checked
+            //                             ? [...selectedValues, option]
+            //                             : selectedValues.filter(v => v!== option)  
+            //                         onLocalChange(updated)
+            //                     }}
+            //                 />
+            //                 {option}
+            //             </label>
+            //         ))};
+            //     </div>
+            // );
+        case 'object-enum':
+            if (mappings[nodeId]?.['dynamic_object']) {
+                return (
+                    <span style={{ color: '#888', marginLeft: '8px' }}>
+                        - {formFieldsDict[mappings[nodeId]?.['dynamic_object'].sourceId]?.formName}
+                                .{mappings[nodeId]?.['dynamic_object'].sourceField}
+                    </span>
+                )
+            }
+
+            return <div>click to select a dynamic object</div>
 
         default:
             return <div>other avantos_type: {avantos_type}</div>
@@ -218,15 +264,34 @@ export const PrefillField: React.FC<PrefillFieldProps> = ({
     onLocalChange,
 }) => {
     const [ modalOpen, setModalOpen ] = useState(false);
+    const [selectedField, setSelectedField] = useState<string | null>(null);
+
     const { formValues } = useFormValues();
 
     const handleFieldClick = (fieldName: string) => {
         if (fieldName === 'dynamic_checkbox_group'
             || fieldName === 'dynamic_object') {
-            
-            setModalOpen(!modalOpen);
+        
+        setSelectedField(fieldName);
+        setModalOpen(!modalOpen);
         }
-    }
+    };
+
+    const { mappings, setMappings } = useFieldMapping(); 
+    const handleMappingSelect = (type: string, id: string, field: string) => {
+        setMappings(prev => ({
+        ...prev,
+        [nodeId]: {
+            ...prev[nodeId],
+            [fieldObject.fieldName]: {
+            sourceType: type,
+            sourceId: id,
+            sourceField: field
+            }
+        }
+        }));
+        setModalOpen(false);
+    };
 
     // get prefill value
     // Apply prefill logic when usePrefill is true
@@ -256,33 +321,52 @@ export const PrefillField: React.FC<PrefillFieldProps> = ({
 
     
     return (
-        <div
-            key={nodeId + "_" + fieldObject.fieldName}
-            style={{
-                border: '0.1rem solid #ddd',
-                padding: '0.4rem',
-                marginBottom: '0.3rem',
-                display: 'flex',
-                justifyContent: 'space-between'
-            }}
-            onClick={() => handleFieldClick(fieldObject.fieldName)}
-        >
-            <div>
-                <strong>{fieldObject.fieldName}</strong> {fieldObject.avantos_type}
+        <div>
+            <div
+                key={nodeId + "_" + fieldObject.fieldName}
+                style={{
+                    border: '0.1rem solid #ddd',
+                    padding: '0.4rem',
+                    marginBottom: '0.3rem',
+                    display: 'flex',
+                    justifyContent: 'space-between'
+                }}
+                onClick={() => handleFieldClick(fieldObject.fieldName)}
+            >
+                <div>
+                    <strong>{fieldObject.fieldName}</strong> {fieldObject.avantos_type}
+                </div>
+                <div style={{ color: "gray"}}>
+                    {prefillValueSource
+                        ? `${prefillValueSource}`
+                        : 'No Mapping'}
+                </div>
+                {renderInputField(
+                    fieldObject.avantos_type, 
+                    displayValue, 
+                    usePrefill, 
+                    onLocalChange, 
+                    onSubmit,
+                    mappings,
+                    nodeId,
+                    formFieldsDict
+                )}
+                
             </div>
-            <div style={{ color: "gray"}}>
-                {prefillValueSource
-                    ? `${prefillValueSource}`
-                    : 'No Mapping'}
-            </div>
-            {renderInputField(fieldObject.avantos_type, displayValue, usePrefill, onLocalChange, onSubmit)}
-            
+
             <CustomModal
-                nodeId={nodeId}
-                isOpen={modalOpen}
-                formDependenciesDict={formDependenciesDict}
-                formFieldsDict={formFieldsDict}
-            />
+                    currentNodeId={nodeId}
+                    isOpen={modalOpen}
+                    formDependenciesDict={formDependenciesDict}
+                    formFieldsDict={formFieldsDict}
+
+                    onClose={() => {
+                        setModalOpen(false);
+                        setSelectedField(null);
+                    }}
+                    onSelect={handleMappingSelect}
+                />
         </div>
+        
     );
 }

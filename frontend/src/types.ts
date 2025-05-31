@@ -87,3 +87,15 @@ export type TempFormValueDict = {
         }
     }
 }
+
+export interface FieldMapping {
+  sourceType: string;
+  sourceId: string;
+  sourceField: string;
+}
+
+export type MappingDict = {
+  [formId: string]: {
+    [fieldName: string]: FieldMapping;
+  };
+};
