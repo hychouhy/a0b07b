@@ -79,3 +79,11 @@ export interface ProcessedGraphData {
     formFieldsDict: FormFieldsDict;
     sortedFormIds: string[];
 }
+
+export type TempFormValueDict = {
+    [formId: string]: {
+        [fieldName: string]: {
+            value: any; 
+        }
+    }
+}
