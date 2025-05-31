@@ -66,8 +66,7 @@ export const FormNode: React.FC<FormNodeProps> = ({
                                 paddingRight : '1rem'
                             }}
                 > 
-
-                    <p> Form ID: {nodeId} </p>
+                    {/* <p> Form ID: {nodeId} </p> */}
                     {formDependenciesDict[nodeId].parentIds.length > 0 &&
                         <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
                             <input
